@@ -6,7 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Syncfusion.Blazor.Gantt" Version="19.4.0.56" />
-    <PackageReference Include="Syncfusion.Blazor.ProgressBar" Version="19.4.0.56" />
+    <PackageReference Include="Syncfusion.Blazor.Gantt" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.ProgressBar" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47" />
   </ItemGroup>
 </Project>

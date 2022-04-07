@@ -5,22 +5,10 @@
 @using Syncfusion.Blazor.ProgressBar
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.TreeGrid
-@using Action = Syncfusion.Blazor.Grids.Action
-@inject IJSRuntime JSRuntime
 <link href="css/gantttaskbar.css" rel="stylesheet" />
 
-<table class="table">
-    <tbody>
-        <tr>
-            <td><h6>Please Enter the Row Height</h6></td>
-            <td>
-                <input type="number" @bind-value="@RowsHeight">
-            </td>
-        </tr>
-    </tbody>
-</table>
 
-<SfGantt DataSource="@TaskCollection" ProjectStartDate="new DateTime(2022,3,1)" ID="GanttChart" Width="1200px" Height="450px" @ref="Gantt" HighlightWeekends="true"  TreeColumnIndex=1 RowHeight="RowsHeight" GridLines="Syncfusion.Blazor.Gantt.GridLine.None">
+<SfGantt DataSource="@TaskCollection" ProjectStartDate="new DateTime(2022,4,1)" ID="GanttChart" Width="1200px" Height="450px" @ref="Gantt" HighlightWeekends="true"  TreeColumnIndex=1 RowHeight="40" GridLines="Syncfusion.Blazor.Gantt.GridLine.None">
     <GanttTaskFields Id="TaskId" Name="TaskName" StartDate="StartDate" EndDate="EndDate" Duration="Duration" ParentID="ParentId" Dependency="Predecessor" ExpandState="IsExpanded"></GanttTaskFields>
     <GanttColumns>
         <GanttColumn Field="TaskId"></GanttColumn>
@@ -31,9 +19,9 @@
         <GanttColumn Field="Done" HeaderText="Done"></GanttColumn>
         <GanttColumn Field="IsMilestone"></GanttColumn>
     </GanttColumns>
-    <GanttTimelineSettings TimelineUnitSize=100>
-        <GanttTopTierSettings Unit="@TopTierUnit" Format="@TopTierFormat"></GanttTopTierSettings>
-        <GanttBottomTierSettings Unit="@BottomTierUnit">
+        <GanttTimelineSettings TimelineUnitSize=100>
+        <GanttTopTierSettings Unit="TimelineViewMode.Month" Format="MMM"></GanttTopTierSettings>
+        <GanttBottomTierSettings Unit="TimelineViewMode.Week">
                 <FormatterTemplate>
                 @{
                     @if (context.Tier == "bottom")
@@ -48,10 +36,7 @@
     <GanttTemplates TValue="TaskData">
         <ParentTaskbarTemplate>
             <div class="e-gantt-parent-taskbar e-custom-parent" style="height:22px;border-radius:5px;text-overflow:ellipsis;">
-                @if (((context as TaskData).IsExpanded) == false)
-                {
-                    <span class="e-task-label" style="color:black;top:18px;font-size:9px;overflow: hidden;white-space: nowrap;">@totalHours((context as TaskData).TaskId)</span>
-                }
+                <span class="e-task-label" style="color:black;top:18px;font-size:9px;overflow: hidden;white-space: nowrap;">@totalHours((context as TaskData).TaskId)</span>
             </div>
         </ParentTaskbarTemplate>
         <TaskbarTemplate>
@@ -66,37 +51,24 @@
                         </Content>
                     </TooltipTemplates>
                     <div class="e-gantt-child-taskbar e-custom-moments" style="height:34px;border-radius:5px;">
-                        <div class="e-custom-div1" style="height:10px;border-radius:5px;margin-top:14px;"></div>
-                        <SfTooltip Target=".e-custom-div" CssClass="customdivtooltip" ShowTipPointer=false>
-                            <TooltipTemplates>
-                                <Content>
-                                    <div>
-                                        <h6>There are 12 more hours changed than scheduled</h6>
-                                        <br>
-                                        <h6>Changed 28h</h6>
-                                        <SfProgressBar Value="28" Height="10" Minimum="0" Maximum="28" TrackThickness="6" ProgressThickness="6" ProgressColor="#FFA500" CornerRadius="CornerType.Round"></SfProgressBar>
-                                        <h6>Scheduled 16h</h6>
-                                        <SfProgressBar Value="16" Height="10" Minimum="0" Maximum="28" TrackThickness="6" ProgressThickness="6" ProgressColor="#60A3D9" CornerRadius="CornerType.Round"></SfProgressBar>
-                                        <br>
-                                        <SfButton ID=".e-custom-div" @onclick="CustomDivClicked" Content="Show in X-ray Mode"></SfButton>
-                                    </div>
-                                </Content>
-                            </TooltipTemplates>
-                            <div class="e-custom-div" style="height:10px;border-radius:5px;"></div>
-                        </SfTooltip>
+                        <div>
+                            <p>There are 12 more hours changed than scheduled</p>
+                            <div style="position:absolute;top:13px">
+                                <SfProgressBar Value="28" Height="10" Minimum="0" Maximum="28" TrackThickness="10" ProgressThickness="6" ProgressColor="#FFA500" CornerRadius="CornerType.Round"></SfProgressBar>
+                             </div>       
+                        </div>
                     </div>
             </SfTooltip>            
             <span class="e-task-label" style="color:black;top:18px;font-size:12px;overflow: hidden;white-space: nowrap;">@((context as TaskData).TaskName)</span>
             }
             else
             {
-                <div class="e-gantt-child-taskbar e-custom-moments" style="height:34px;border-radius:5px;"></div>
                 <div class="e-gantt-child-taskbar milestone"></div>
             }
 
         </TaskbarTemplate>
     </GanttTemplates>
-    <GanttEvents Created="created" BeforeTooltipRender="BeforeTooltipRender" QueryCellInfo="QueryCellInfo" TValue="TaskData"></GanttEvents>
+    <GanttEvents Created="created" BeforeTooltipRender="BeforeTooltipRender" TValue="TaskData"></GanttEvents>
     <GanttEventMarkers>
         <GanttEventMarker Day="Event1" Label="Today"
                           CssClass="e-custom-event-marker"></GanttEventMarker>
@@ -111,40 +83,17 @@
 
 @code{
     public SfGantt<TaskData> Gantt;
-    private List<string?> keys = new List<string?>();
     public List<TaskData> TaskCollection { get; set; }
-    public int RowsHeight { get; set; } = 56;
     public DateTime Event1 = System.DateTime.Now;
     public DateTime Holiday1 = new DateTime(2022, 04, 08);
     public DateTime Holiday2 = new DateTime(2022, 04, 12);
-    public bool isFirst = true;
-    public string TopTierFormat = "MMM";
-    TimelineViewMode TopTierUnit = TimelineViewMode.Month;
-    TimelineViewMode BottomTierUnit = TimelineViewMode.Week;
-    //private static int tooltipX { get; set; } = 0;
-    //private async Task SplitterResized()
-    //{
-    //    await JSRuntime.InvokeAsync<string>("GetSplitPanePosition", 2, Gantt.ID, tooltipX);
-    //}
+    public Dictionary<string, List<TaskData>> ChildRecords = new Dictionary<string, List<TaskData>>();
     private int totalHours(int id)
     {
         var tHours = 0;
-        foreach (IDictionary<string, object> record in Gantt.FlatData)
+        foreach (var record in ChildRecords[id.ToString()])
         {
-            foreach (var key in record.Keys)
-            {
-                if (key == "ParentId")
-                {
-                    object value = null;
-                    var i = record.TryGetValue(key, out value);
-                    if (value != null && (int)value == id)
-                    {
-                        object duration = null;
-                        record.TryGetValue("Duration", out duration);
-                        tHours += Convert.ToInt32(duration);
-                    }
-                }
-            }
+            tHours += Convert.ToInt32(record.Duration);
         }
         return tHours;
     }
@@ -152,27 +101,19 @@
     protected override void OnInitialized()
     {
         this.TaskCollection = GetTaskCollection();
-        keys =  this.TaskCollection.GroupBy(rec => rec.ParentId).Where(g => g.Key != null).ToDictionary(g => g.Key.ToString(), g => g.ToList()).Keys.ToList();//collect the ParentId values using GroupBy
+        foreach (TaskData record in this.TaskCollection)
+        {
+            if(record.ParentId == null){ continue; }
+            var key = record.ParentId.ToString();
+            if (!ChildRecords.ContainsKey(key))
+            {
+                ChildRecords[key] = new List<TaskData>();
+            }
+            ChildRecords[key].Add(record);
+        }
     }
    
-    public string Formatter(DateTime? date)
-    {
-        DateTime dateTime = (DateTime)(date);
-        string bottomString = "";
-        if (BottomTierUnit.ToString() == "Week")
-        {
-            bottomString = dateTime.Day + "-" + ((dateTime.AddDays(6)).Day);
-        }
-        else if (BottomTierUnit.ToString() == "Day")
-        {
-            bottomString = dateTime.Day.ToString();
-        }
-        else if (BottomTierUnit.ToString() == "Month")
-        {
-            bottomString = dateTime.ToString("MMM");
-        }
-        return bottomString;
-    }
+
     
     private async Task ButtonClick1()
     {
@@ -190,26 +131,7 @@
     {
         await JSRuntime.InvokeAsync<object>("ButtonClick", "Clicked X-ray mode");
     }
-    public void QueryCellInfo(Syncfusion.Blazor.Grids.QueryCellInfoEventArgs<TaskData> args)
-    {
-        if (isFirst)
-        {
-            if (args.Column.Index == Gantt.Columns.Count() - 1)
-            {
-                isFirst = false;
-            }
-            args.Cell.AddClass(new string[] { "line" });
-        }
-        if (args.Column.Field.Equals("TaskName"))
-        {            
-            if (args.Data.ParentId == null || keys.Contains(args.Data.TaskId.ToString()))   // Checking whether it is a parent record by comparing IdMapping field of record with the ParentID values
-            {
-                args.Cell.AddClass(new string[] { "parent-bold" });   // customized only parent rows
-                args.Cell.AddClass(new string[] { "line" }); // customized to draw line for parent task name
-            }
-            args.Cell.AddClass(new string[] { "nameColumn" });
-        }
-    }
+ 
     public void QueryChartRowInfo(Syncfusion.Blazor.Gantt.QueryChartRowInfoEventArgs<TaskData> args)
     {
         String[] s1 = new String[1] { "intro" };
@@ -220,11 +142,6 @@
         args.Cancel = true;
     }
 
-    //[JSInvokable]
-    //public static void SetTooltipPosition(int tooltipPosition)
-    //{
-    //    tooltipX = tooltipPosition;
-    //}
 
     public async Task created()
     {
@@ -233,7 +150,12 @@
     }
 
     
-
+    public string Formatter(DateTime? date)
+    {
+        DateTime dateTime = (DateTime)(date);
+        string bottomString =  dateTime.Day + "-" + ((dateTime.AddDays(6)).Day);
+        return bottomString;
+    }
     
     public class TaskData
     {
