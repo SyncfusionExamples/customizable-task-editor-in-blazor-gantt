@@ -1,16 +1,41 @@
-﻿    @page "/"
+﻿@page "/CSS-Taskbar"
 
-@inject IJSRuntime JSRuntime
-@using Syncfusion.Blazor.Popups
-@using Syncfusion.Blazor.ProgressBar
-@using Syncfusion.Blazor.DropDowns
-@using Syncfusion.Blazor.TreeGrid
-@using System.Text
-<link href="css/gantttaskbar.css" rel="stylesheet" />
+<style>
 
+    .e-gantt .e-gantt-parent-taskbar.e-gantt-parent-taskbar-inner-div {
+        border-radius: 14px;
+        background-color: forestgreen;
+        border-color: forestgreen
+    }
 
-<SfGantt DataSource="@TaskCollection" ProjectStartDate="new DateTime(2022,4,1)" ID="GanttChart" Width="800px" Height="450px" @ref="Gantt" HighlightWeekends="true"  TreeColumnIndex=1 RowHeight="40" GridLines="Syncfusion.Blazor.Gantt.GridLine.None">
-    <GanttTaskFields Id="TaskId" Name="TaskName" StartDate="StartDate" EndDate="EndDate" Duration="Duration" Milestone="IsMilestone" ParentID="ParentId" Dependency="Predecessor" ExpandState="IsExpanded"></GanttTaskFields>
+    .e-gantt .e-gantt-parent-taskbar .e-gantt-parent-progressbar-inner-div {
+        border-top-right-radius: 14px !important;
+        border-bottom-right-radius: 14px !important;
+    }
+
+    .e-gantt .e-gantt-child-taskbar.e-gantt-child-taskbar-inner-div {
+        border-radius: 14px;
+        background-color: mediumpurple;
+        border-color: mediumpurple
+    }
+
+    .e-gantt .e-gantt-child-taskbar .e-gantt-child-progressbar-inner-div {
+        border-top-right-radius: 14px !important;
+        border-bottom-right-radius: 14px !important;
+        background-color: purple;
+    }
+
+    .e-gantt .criticaltask .e-gantt-child-taskbar.e-gantt-child-taskbar-inner-div { background-color: crimson }  
+
+    .e-gantt .e-gantt-chart .e-milestone-top, .e-gantt .e-gantt-chart .e-milestone-bottom { border-bottom-color: forestgreen; border-top-color: forestgreen; }
+
+    .e-gantt .e-gantt-chart .e-line {border-color: yellow;} 
+    .e-gantt .e-gantt-chart .e-connector-line-right-arrow, .e-gantt .e-gantt-chart .e-connector-line-left-arrow  { border-left-color: yellow; }
+
+</style>
+
+<SfGantt DataSource="@TaskCollection" ProjectStartDate="new DateTime(2022,4,1)" ID="GanttChart" Width="1200px" Height="450px" @ref="Gantt" HighlightWeekends="true"  TreeColumnIndex=1 RowHeight="40" GridLines="Syncfusion.Blazor.Gantt.GridLine.None">
+    <GanttTaskFields Id="TaskId" Name="TaskName" StartDate="StartDate" EndDate="EndDate" Progress="Progress" Duration="Duration" Milestone="IsMilestone" ParentID="ParentId" Dependency="Predecessor"></GanttTaskFields>
     <GanttColumns>
         <GanttColumn Field="TaskId"></GanttColumn>
         <GanttColumn Field="TaskName" Width=300></GanttColumn>
@@ -23,146 +48,32 @@
         <GanttTimelineSettings TimelineUnitSize=100>
         <GanttTopTierSettings Unit="TimelineViewMode.Month" Format="MMM"></GanttTopTierSettings>
         <GanttBottomTierSettings Unit="TimelineViewMode.Week">
-                <FormatterTemplate>
-                @{
-                    @if (context.Tier == "bottom")
-                    {
-                        <div> @this.Formatter((context.Date)) </div>
-                    }
-                }
-                </FormatterTemplate>
         </GanttBottomTierSettings>
     </GanttTimelineSettings>
     <GanttEditSettings AllowEditing="true" AllowAdding="true" AllowDeleting="true" AllowTaskbarEditing="true"></GanttEditSettings>
-    <GanttTemplates TValue="TaskData">
-        <ParentTaskbarTemplate>
-            <div class="e-gantt-parent-taskbar e-custom-parent" style="height:22px;border-radius:5px;text-overflow:ellipsis;">
-                <span class="e-task-label" style="color:black;top:18px;font-size:9px;overflow: hidden;white-space: nowrap;">@totalHours((context as TaskData).TaskId)</span>
-            </div>
-        </ParentTaskbarTemplate>
-        <TaskbarTemplate>
-            <SfTooltip Target=".e-gantt-child-taskbar" CssClass="customtooltip" CloseDelay="1000" ShowTipPointer=false Position="Position.TopRight" OffsetX=-110 OffsetY=10 WindowCollision=true OpensOn="Hover">
-                    <TooltipTemplates>
-                        <Content>
-                            <SfButton ID=".e-gantt-child-taskbar" IconCss="e-icons e-open-icon" CssClass="e-round" @onclick="ButtonClick1"></SfButton>
-                            <SfButton ID=".e-gantt-child-taskbar" IconCss="e-icons e-refresh-icon" CssClass="e-round" @onclick="ButtonClick2"></SfButton>
-                            <SfButton ID=".e-gantt-child-taskbar" IconCss="e-icons e-clear-icon" CssClass="e-round" @onclick="ButtonClick3"></SfButton>
-                        </Content>
-                    </TooltipTemplates>
-                    <div class="e-gantt-child-taskbar e-custom-moments" style="height:34px;border-radius:5px;">
-                        <div>
-                            <p>Duration: 3 days</p>
-                            <div style="position:absolute;top:13px">
-                            @{
-                                TaskData data = context as TaskData;
-                            }
-
-                            <SfProgressBar Value="(int.Parse(data.Duration) * (data.Progress)/100)" Height="10" Minimum="0" Maximum="int.Parse(data.Duration)" TrackThickness="10" ProgressThickness="6" ProgressColor="#FFA500" CornerRadius="CornerType.Round"></SfProgressBar>
-                             </div>       
-                        </div>
-                    </div>
-            </SfTooltip>
-        </TaskbarTemplate>
-        <MilestoneTemplate>
-              <div style="margin-top:-7px;">
-                            <div class="e-gantt-milestone" style="position:absolute;">
-                                <img class="moments" height="24" width="48" />
-                            </div>
-                        </div>
-        </MilestoneTemplate>
-    </GanttTemplates>
-    <GanttEvents Created="created" BeforeTooltipRender="BeforeTooltipRender" TValue="TaskData"></GanttEvents>
-    <GanttEventMarkers>
-        <GanttEventMarker Day="Event1" Label="Today"
-                          CssClass="e-custom-event-marker"></GanttEventMarker>
-    </GanttEventMarkers>
-    <GanttHolidays>
-        <GanttHoliday From="@Holiday1" To="@Holiday2" Label="Public holidays"
-                      CssClass="e-custom-holiday"></GanttHoliday>
-    </GanttHolidays>
     <GanttSplitterSettings Position="280px"></GanttSplitterSettings>
+    <GanttEvents QueryChartRowInfo="QueryChartRowInfoHandler" TValue="TaskData"></GanttEvents>
 </SfGantt>
-
 
 @code{
     public SfGantt<TaskData> Gantt;
     public List<TaskData> TaskCollection { get; set; }
-    public DateTime Event1 = System.DateTime.Now;
-    public DateTime Holiday1 = new DateTime(2022, 04, 08);
-    public DateTime Holiday2 = new DateTime(2022, 04, 12);
-    public Dictionary<string, List<TaskData>> ChildRecords = new Dictionary<string, List<TaskData>>();
-    private int totalHours(int id)
-    {
-        var tHours = 0;
-        foreach (var record in ChildRecords[id.ToString()])
-        {
-            tHours += Convert.ToInt32(record.Duration);
-        }
-        return tHours;
-    }
 
     protected override void OnInitialized()
     {
         this.TaskCollection = GetTaskCollection();
-        foreach (TaskData record in this.TaskCollection)
+    }
+
+    public void QueryChartRowInfoHandler(Syncfusion.Blazor.Gantt.QueryChartRowInfoEventArgs<TaskData> args)
+    {
+        if(args.Data.TaskId == 6)
         {
-            if(record.ParentId == null){ continue; }
-            var key = record.ParentId.ToString();
-            if (!ChildRecords.ContainsKey(key))
-            {
-                ChildRecords[key] = new List<TaskData>();
-            }
-            ChildRecords[key].Add(record);
+            String[] s1 = new String[1] { "criticaltask" };
+            args.Row.AddClass(s1);
+
         }
     }
 
-
-
-    private async Task ButtonClick1()
-    {
-        await JSRuntime.InvokeAsync<object>("ButtonClick", "Button1clicked");
-    }
-    private async Task ButtonClick2()
-    {
-        await JSRuntime.InvokeAsync<object>("ButtonClick", "Button2clicked");
-    }
-    private async Task ButtonClick3()
-    {
-        await JSRuntime.InvokeAsync<object>("ButtonClick", "Button3clicked");
-    }
-    private async Task CustomDivClicked()
-    {
-        await JSRuntime.InvokeAsync<object>("ButtonClick", "Clicked X-ray mode");
-    }
-
-    public void QueryChartRowInfo(Syncfusion.Blazor.Gantt.QueryChartRowInfoEventArgs<TaskData> args)
-    {
-        String[] s1 = new String[1] { "intro" };
-        args.Row.AddClass(s1);
-    }
-    public void BeforeTooltipRender(BeforeTooltipRenderEventArgs<TaskData> args)
-    {
-        args.Cancel = true;
-    }
-
-
-    public async Task created()
-    {
-        //await JSRuntime.InvokeAsync<string>("GetSplitPanePosition", 2, Gantt.ID, tooltipX);
-        await JSRuntime.InvokeAsync<string>("StyleEventMarker", Gantt.EventMarkers, Gantt.ProjectStartDate, Gantt.TimelineSettings.TimelineUnitSize, Gantt.TimelineSettings.BottomTier.Unit.ToString());
-    }
-
-
-    public string Formatter(DateTime? date)
-    {
-        DateTime dateTime = (DateTime)(date);
-        if (Gantt.ProjectStartDate.Equals(dateTime))
-        {
-            return "1";
-        }
-        string bottomString =  dateTime.Day + "-" + ((dateTime.AddDays(6)).Day);
-        return bottomString;
-    }
     
     public class TaskData
     {
@@ -217,7 +128,7 @@
         TaskId = 4,
         TaskName = "Soil test approval",
         StartDate = new DateTime(2022, 04, 02),
-        Duration = "6",
+        Duration = "3",
         Progress = 30,
         ParentId = 1,
         Predecessor = "3",
@@ -420,4 +331,5 @@
 };
         return Tasks;
     }
+
 }
