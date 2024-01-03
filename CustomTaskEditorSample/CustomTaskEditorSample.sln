@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomTaskEditorSample", "CustomTaskEditorSample.csproj", "{11199532-62A2-4A96-9B18-7017BFD4BF52}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11199532-62A2-4A96-9B18-7017BFD4BF52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11199532-62A2-4A96-9B18-7017BFD4BF52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11199532-62A2-4A96-9B18-7017BFD4BF52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11199532-62A2-4A96-9B18-7017BFD4BF52}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EC3D91E3-8B3D-4AAC-8EAD-87B0F410DE33}
+	EndGlobalSection
+EndGlobal
